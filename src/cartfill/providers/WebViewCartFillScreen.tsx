@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import { PLATFORM_CONFIGS } from './platformConfigs';
+import { PLATFORM_CONFIGS } from '../platformConfigs';
 import { buildInjectionScript } from './injection';
-import { QuickCommercePlatform, ShoppingListItem } from '../types';
+import { QuickCommercePlatform, ShoppingListItem } from '../../types';
 
 type ItemStatus = 'pending' | 'added' | 'failed';
 
@@ -12,7 +12,7 @@ interface Props {
   items: ShoppingListItem[];
 }
 
-export default function CartFillScreen({ platform, items }: Props) {
+export default function WebViewCartFillScreen({ platform, items }: Props) {
   const config = PLATFORM_CONFIGS[platform];
   const webviewRef = useRef<WebView>(null);
   const [statuses, setStatuses] = useState<ItemStatus[]>(items.map(() => 'pending'));

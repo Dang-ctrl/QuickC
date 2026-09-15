@@ -1,8 +1,11 @@
 import { QuickCommercePlatform } from '../types';
+import { CartProviderKind } from './types';
 
 export interface PlatformConfig {
   id: QuickCommercePlatform;
   label: string;
+  /** See CartProviderKind in ./types for what each value means and why. */
+  providerKind: CartProviderKind;
   url: string;
   /**
    * DOM hints, kept separate from the injection engine so they can be
@@ -29,6 +32,7 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
   blinkit: {
     id: 'blinkit',
     label: 'Blinkit',
+    providerKind: 'webview',
     url: 'https://blinkit.com',
     hints: {
       searchTriggerTextIncludes: 'Search "',
@@ -40,6 +44,7 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
   zepto: {
     id: 'zepto',
     label: 'Zepto',
+    providerKind: 'webview',
     url: 'https://www.zeptonow.com',
     hints: {
       searchTriggerTextIncludes: 'Search for',
@@ -50,7 +55,11 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
   },
   instamart: {
     id: 'instamart',
+    // Target state once Swiggy Builders Club access is granted: 'mcp'.
+    // Falls back to 'webview' automatically at runtime until then — see
+    // resolveProviderKind() in ./index.ts.
     label: 'Swiggy Instamart',
+    providerKind: 'mcp',
     url: 'https://www.swiggy.com/instamart',
     hints: {
       searchTriggerTextIncludes: 'Search for',

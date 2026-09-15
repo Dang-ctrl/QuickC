@@ -1,4 +1,4 @@
-import { PlatformConfig } from './platformConfigs';
+import { PlatformConfig } from '../platformConfigs';
 
 export interface CartFillItem {
   name: string;

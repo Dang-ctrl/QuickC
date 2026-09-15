@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import PlanScreen from './src/screens/PlanScreen';
 import ShoppingListScreen from './src/screens/ShoppingListScreen';
-import CartFillScreen from './src/cartfill/CartFillScreen';
+import { resolveProviderKind, WebViewCartFillScreen, McpCartFillScreen } from './src/cartfill';
 import { generateWeekPlan } from './src/lib/planGenerator';
 import { consolidateShoppingList } from './src/lib/shoppingList';
 import { HouseholdProfile, WeekPlan, ShoppingListItem, QuickCommercePlatform } from './src/types';
@@ -51,7 +51,12 @@ export default function App() {
         />
       )}
 
-      {step.name === 'cartfill' && <CartFillScreen platform={step.platform} items={step.items} />}
+      {step.name === 'cartfill' &&
+        (resolveProviderKind(step.platform) === 'mcp' ? (
+          <McpCartFillScreen platform={step.platform} items={step.items} />
+        ) : (
+          <WebViewCartFillScreen platform={step.platform} items={step.items} />
+        ))}
     </SafeAreaView>
   );
 }
