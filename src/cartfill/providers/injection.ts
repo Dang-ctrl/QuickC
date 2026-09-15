@@ -98,11 +98,25 @@ export function buildInjectionScript(items: CartFillItem[], config: PlatformConf
       return { name, ok: true };
     }
 
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timed-out')), ms)),
+      ]);
+    }
+
     (async function run() {
+      window.__cartfillCancelled = false;
       post({ type: 'start', total: items.length });
       for (let i = 0; i < items.length; i++) {
+        if (window.__cartfillCancelled) {
+          post({ type: 'cancelled', atIndex: i });
+          return;
+        }
         try {
-          const result = await addItem(items[i].name);
+          // Bounded per-item: a single stuck step (page navigation mid-flight,
+          // a wedged async site action) must not hang the whole run forever.
+          const result = await withTimeout(addItem(items[i].name), 12000);
           post({ type: 'item-result', index: i, ...result });
         } catch (err) {
           post({ type: 'item-result', index: i, name: items[i].name, ok: false, reason: String(err && err.message || err) });
