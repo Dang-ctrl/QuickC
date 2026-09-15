@@ -15,6 +15,13 @@ export interface PlatformConfig {
    * rather than class names. Re-check these whenever add-to-cart silently
    * stops working; that's a "site changed its markup" signal, not a bug
    * in the engine.
+   *
+   * searchInputSelector is deliberately a bare 'input', not
+   * 'input[type="text"]' — confirmed live on 2026-09-15 that Blinkit's
+   * search box has no `type` HTML attribute at all (only the browser's IDL
+   * default makes `.type` read "text" in JS), so the attribute selector
+   * silently matched nothing. Zepto/Instamart haven't hit this specific
+   * failure yet but use the same safe selector preemptively.
    */
   hints: {
     /** Text shown on the homepage search bar before it's activated (e.g. `Search "milk"`). Clicking it (or its container) opens real search. */
@@ -36,9 +43,9 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
     url: 'https://blinkit.com',
     hints: {
       searchTriggerTextIncludes: 'Search "',
-      searchInputSelector: 'input[type="text"]',
+      searchInputSelector: 'input',
       addButtonText: 'ADD',
-      resultsSettleMs: 1200,
+      resultsSettleMs: 2000,
     },
   },
   zepto: {
@@ -48,9 +55,9 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
     url: 'https://www.zeptonow.com',
     hints: {
       searchTriggerTextIncludes: 'Search for',
-      searchInputSelector: 'input[type="text"]',
+      searchInputSelector: 'input',
       addButtonText: 'ADD',
-      resultsSettleMs: 1200,
+      resultsSettleMs: 2000,
     },
   },
   instamart: {
@@ -63,9 +70,9 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
     url: 'https://www.swiggy.com/instamart',
     hints: {
       searchTriggerTextIncludes: 'Search for',
-      searchInputSelector: 'input[type="text"]',
+      searchInputSelector: 'input',
       addButtonText: 'Add',
-      resultsSettleMs: 1200,
+      resultsSettleMs: 2000,
     },
   },
 };

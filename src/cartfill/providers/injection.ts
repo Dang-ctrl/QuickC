@@ -68,8 +68,24 @@ export function buildInjectionScript(items: CartFillItem[], config: PlatformConf
       return null;
     }
 
+    // Sites like Blinkit re-render parts of the page on their own timers
+    // (a rotating promo banner, live price/stock updates) which can make an
+    // element momentarily vanish from a single synchronous check even
+    // though the page is fine a few hundred milliseconds later. A single
+    // check-and-give-up treats that blip as permanent failure; polling
+    // rides it out instead.
+    async function pollFor(fn, { intervalMs = 250, timeoutMs = 4000 } = {}) {
+      const deadline = Date.now() + timeoutMs;
+      while (Date.now() < deadline) {
+        const result = fn();
+        if (result) return result;
+        await sleep(intervalMs);
+      }
+      return null;
+    }
+
     async function ensureSearchOpen() {
-      let input = findVisible(hints.searchInputSelector);
+      let input = await pollFor(() => findVisible(hints.searchInputSelector), { timeoutMs: 800 });
       if (input) return input;
 
       const candidates = document.querySelectorAll('div, span, button');
@@ -79,8 +95,10 @@ export function buildInjectionScript(items: CartFillItem[], config: PlatformConf
           break;
         }
       }
-      await sleep(600);
-      return findVisible(hints.searchInputSelector);
+      // Clicking the search trigger can be a full page navigation (e.g.
+      // Blinkit routes to /s/), not just an in-place overlay, so this needs
+      // real polling headroom rather than one fixed-length wait.
+      return pollFor(() => findVisible(hints.searchInputSelector), { timeoutMs: 4000 });
     }
 
     async function addItem(name) {
@@ -91,7 +109,7 @@ export function buildInjectionScript(items: CartFillItem[], config: PlatformConf
       setNativeValue(input, name);
       await sleep(hints.resultsSettleMs);
 
-      const addBtn = findByExactText(document, hints.addButtonText);
+      const addBtn = await pollFor(() => findByExactText(document, hints.addButtonText), { timeoutMs: 2500 });
       if (!addBtn) return { name, ok: false, reason: 'add-button-not-found' };
 
       addBtn.click();
