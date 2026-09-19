@@ -32,6 +32,13 @@ export interface PlatformConfig {
     addButtonText: string;
     /** Milliseconds to wait after typing before results are assumed rendered. */
     resultsSettleMs: number;
+    /**
+     * True when typing only shows autocomplete suggestions and real product
+     * results need the search submitted (Zepto). Sites that navigate to
+     * results while typing (Blinkit) leave this false; the engine still falls
+     * back to pressing Enter once if no matching product shows up.
+     */
+    pressEnterAfterTyping: boolean;
   };
 }
 
@@ -46,18 +53,20 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
       searchInputSelector: 'input',
       addButtonText: 'ADD',
       resultsSettleMs: 2000,
+      pressEnterAfterTyping: false,
     },
   },
   zepto: {
     id: 'zepto',
     label: 'Zepto',
     providerKind: 'webview',
-    url: 'https://www.zeptonow.com',
+    url: 'https://www.zepto.com',
     hints: {
       searchTriggerTextIncludes: 'Search for',
       searchInputSelector: 'input',
       addButtonText: 'ADD',
       resultsSettleMs: 2000,
+      pressEnterAfterTyping: true,
     },
   },
   instamart: {
@@ -73,6 +82,7 @@ export const PLATFORM_CONFIGS: Record<QuickCommercePlatform, PlatformConfig> = {
       searchInputSelector: 'input',
       addButtonText: 'Add',
       resultsSettleMs: 2000,
+      pressEnterAfterTyping: false,
     },
   },
 };
